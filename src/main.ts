@@ -2,7 +2,6 @@ import axios from 'axios';
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import * as github from '@actions/github';
-import * as child from 'child_process';
 import fs from 'fs';
 import path from 'path';
 
