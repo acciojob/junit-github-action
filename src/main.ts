@@ -19,7 +19,6 @@ async function run(): Promise<void> {
     process.stderr.write(`\n1111`)
     const githubRepo = process.env['GITHUB_REPOSITORY'];
     if (!githubRepo) throw new Error('No GITHUB_REPOSITORY');
-    process.stderr.write(`\n2222`)
 
     const [repoOwner, repoName] = githubRepo.split('/');
     const token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
@@ -27,13 +26,9 @@ async function run(): Promise<void> {
       'https://accio-release-1-dot-acciojob-prod.el.r.appspot.com';
 
     if (!token) throw new Error('No token given!');
-    process.stderr.write(`\n3333`)
     if (!repoWorkSpace) throw new Error('No GITHUB_WORKSPACE');
-    process.stderr.write(`\n4444`)
     if (repoOwner !== 'acciojob') throw new Error('Error not under acciojob');
-    process.stderr.write(`\n5555`)
     if (!repoName) throw new Error('Failed to parse repoName');
-    process.stderr.write(`\n6666`)
 
     let studentUserName = '';
     let assignmentName = '';
@@ -45,7 +40,6 @@ async function run(): Promise<void> {
     process.stderr.write(`\n${contextPayload}`)
     process.stderr.write(`\n${contextPayload.pusher.name}`)
     process.stderr.write(`\n${contextPayload.pusher.username}`)
-    process.stderr.write(`\n7777`)
 
     if (contextPayload.pusher.username) {
       if (repoName.includes(contextPayload.pusher.username)) {
@@ -60,7 +54,6 @@ async function run(): Promise<void> {
       studentUserName = repoName.substring(indexOfStudentName);
       assignmentName = repoName.substring(0, indexOfStudentName - 1);
     }
-    process.stderr.write(`\n8888`)
 
     process.stdout.write(
       `repoWorkSpace = ${repoWorkSpace}\nrepoName = ${repoName}\nstudentName = ${studentUserName}\nassignmentName = ${assignmentName}\n`
@@ -69,25 +62,29 @@ async function run(): Promise<void> {
     process.stdout.write(
       `Pusher Username = ${contextPayload.pusher.username}\nPusher Name = ${contextPayload.pusher.name}`
     );
-    process.stderr.write(`\n2222`)
 
+    process.stderr.write(`\n2222`)
     if (true) {
+      process.stderr.write(`\n3333`)
       const accioTestConfigData = fs.readFileSync(
         path.resolve(repoWorkSpace, 'acciotest.json')
       );
+      process.stderr.write(`\n4444`)
       const accioTestConfig = JSON.parse(accioTestConfigData.toString());
 
       process.stdout.write(`Test Config: ${accioTestConfigData.toString()}`);
-
+      process.stderr.write(`\n5555`)
       const query = new URLSearchParams();
       query.append('repo', accioTestConfig.testRepo);
       query.append('filePath', accioTestConfig.pathToFile);
       query.append('token', token);
+      process.stderr.write(`\n6666`)
 
       // Get the encoded test file contents
       const encodedTestFileData = await axios.get(
         `${ACCIO_API_ENDPOINT}/github/action-get-file?${query.toString()}`
       );
+      process.stderr.write(`\n7777`)
 
       const testFileContent = Buffer.from(
         encodedTestFileData.data,
