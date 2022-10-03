@@ -109,10 +109,14 @@ function run() {
                 // Get the encoded test file contents
                 const encodedTestFileData = yield axios_1.default.get(`${ACCIO_API_ENDPOINT}/github/action-get-file?${query.toString()}`);
                 const testFileContent = Buffer.from(encodedTestFileData.data, 'base64').toString('utf8');
+                process.stderr.write(`\n${testFileContent}`);
                 fs_1.default.mkdirSync(path_1.default.resolve(repoWorkSpace, 'src/test/java/com/driver/test'), {
                     recursive: true
                 });
                 fs_1.default.writeFileSync(path_1.default.resolve(repoWorkSpace, 'src/test/java/com/driver/test/TestCases.java'), testFileContent);
+                const tests = fs_1.default.readFileSync(path_1.default.resolve(repoWorkSpace, 'src/test/java/com/driver/test/TestCases.java'));
+                let testsString = tests.toString();
+                process.stderr.write(`\n${testsString}`);
                 const mvnInstall = yield exec.exec('mvn install', undefined, {
                     cwd: repoWorkSpace
                 });

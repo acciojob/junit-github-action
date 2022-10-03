@@ -65,36 +65,44 @@ async function run(): Promise<void> {
     process.stderr.write(`\n2222`)
 
     if (true) {
-       const accioTestConfigData = fs.readFileSync(
-         path.resolve(repoWorkSpace, 'acciotest.json')
-       );
-       const accioTestConfig = JSON.parse(accioTestConfigData.toString());
+      const accioTestConfigData = fs.readFileSync(
+        path.resolve(repoWorkSpace, 'acciotest.json')
+      );
+      const accioTestConfig = JSON.parse(accioTestConfigData.toString());
 
-       process.stdout.write(`Test Config: ${accioTestConfigData.toString()}`);
+      process.stdout.write(`Test Config: ${accioTestConfigData.toString()}`);
 
-       const query = new URLSearchParams();
-       query.append('repo', accioTestConfig.testRepo);
-       query.append('filePath', accioTestConfig.pathToFile);
-       query.append('token', token);
+      const query = new URLSearchParams();
+      query.append('repo', accioTestConfig.testRepo);
+      query.append('filePath', accioTestConfig.pathToFile);
+      query.append('token', token);
 
-       // Get the encoded test file contents
-       const encodedTestFileData = await axios.get(
-         `${ACCIO_API_ENDPOINT}/github/action-get-file?${query.toString()}`
-       );
+      // Get the encoded test file contents
+      const encodedTestFileData = await axios.get(
+        `${ACCIO_API_ENDPOINT}/github/action-get-file?${query.toString()}`
+      );
 
-       const testFileContent = Buffer.from(
-         encodedTestFileData.data,
-         'base64'
-       ).toString('utf8');
+      const testFileContent = Buffer.from(
+        encodedTestFileData.data,
+        'base64'
+      ).toString('utf8');
+      process.stderr.write(`\n${testFileContent}`);
 
-       fs.mkdirSync(path.resolve(repoWorkSpace, 'src/test/java/com/driver/test'), {
-         recursive: true
-       });
+      fs.mkdirSync(path.resolve(repoWorkSpace, 'src/test/java/com/driver/test'), {
+        recursive: true
+      });
 
-       fs.writeFileSync(
-         path.resolve(repoWorkSpace, 'src/test/java/com/driver/test/TestCases.java'),
-         testFileContent
-       );
+      fs.writeFileSync(
+        path.resolve(repoWorkSpace, 'src/test/java/com/driver/test/TestCases.java'),
+        testFileContent
+      );
+
+      const tests = fs.readFileSync(
+        path.resolve(repoWorkSpace, 'src/test/java/com/driver/test/TestCases.java')
+      );
+
+      let testsString = tests.toString();
+      process.stderr.write(`\n${testsString}`);
 
       const mvnInstall = await exec.exec('mvn install', undefined, {
         cwd: repoWorkSpace
