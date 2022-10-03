@@ -14,24 +14,24 @@ import path from 'path';
 */
 
 async function run(): Promise<void> {
+  const ACCIO_API_ENDPOINT =
+      'https://accio-release-1-dot-acciojob-prod.el.r.appspot.com';
+  const githubRepo = process.env['GITHUB_REPOSITORY'];
   const repoWorkSpace: string | undefined = process.env['GITHUB_WORKSPACE'];
+  let studentUserName = '';
+  let assignmentName = '';
+  let token
   try {
     process.stderr.write(`\n1111`)
-    const githubRepo = process.env['GITHUB_REPOSITORY'];
     if (!githubRepo) throw new Error('No GITHUB_REPOSITORY');
 
     const [repoOwner, repoName] = githubRepo.split('/');
-    const token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
-    const ACCIO_API_ENDPOINT =
-      'https://accio-release-1-dot-acciojob-prod.el.r.appspot.com';
+    token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
 
     if (!token) throw new Error('No token given!');
     if (!repoWorkSpace) throw new Error('No GITHUB_WORKSPACE');
     if (repoOwner !== 'acciojob') throw new Error('Error not under acciojob');
     if (!repoName) throw new Error('Failed to parse repoName');
-
-    let studentUserName = '';
-    let assignmentName = '';
 
     const contextPayload = github.context.payload;
     process.stderr.write(`\n${githubRepo}`)
@@ -65,32 +65,26 @@ async function run(): Promise<void> {
 
     process.stderr.write(`\n2222`)
     if (true) {
-      process.stderr.write(`\n3333`)
       const accioTestConfigData = fs.readFileSync(
         path.resolve(repoWorkSpace, 'acciotest.json')
       );
-      process.stderr.write(`\n4444`)
+      
       const accioTestConfig = JSON.parse(accioTestConfigData.toString());
 
-      process.stdout.write(`Test Config: ${accioTestConfigData.toString()}`);
-      process.stderr.write(`\n5555`)
       const query = new URLSearchParams();
       query.append('repo', accioTestConfig.testRepo);
       query.append('filePath', accioTestConfig.pathToFile);
       query.append('token', token);
-      process.stderr.write(`\n6666`)
 
       // Get the encoded test file contents
       const encodedTestFileData = await axios.get(
         `${ACCIO_API_ENDPOINT}/github/action-get-file?${query.toString()}`
       );
-      process.stderr.write(`\n7777`)
 
       const testFileContent = Buffer.from(
         encodedTestFileData.data,
         'base64'
       ).toString('utf8');
-      process.stderr.write(`\n${testFileContent}`);
 
       fs.mkdirSync(path.resolve(repoWorkSpace, 'src/test/java/com/driver/test'), {
         recursive: true
@@ -101,18 +95,10 @@ async function run(): Promise<void> {
         testFileContent
       );
 
-      const tests = fs.readFileSync(
-        path.resolve(repoWorkSpace, 'src/test/java/com/driver/test/TestCases.java')
-      );
-
-      let testsString = tests.toString();
-      process.stderr.write(`\n${testsString}`);
-
       const mvnInstall = await exec.exec('mvn install', undefined, {
         cwd: repoWorkSpace
       });
-      process.stderr.write(`\n3333`)
-      process.stderr.write(`\n${mvnInstall}`)
+
       const junitReports = fs.readFileSync(
         path.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt')
       );
@@ -127,10 +113,28 @@ async function run(): Promise<void> {
 
       process.stdout.write(`\nEvaluating score...\n`);
 
+      let testResultsObj = {
+        totalTests: parseInt(testResults[0]),
+        totalPassed: parseInt(testResults[0]) - parseInt(testResults[1]),
+      }
+
+      const {data: score} = await axios.post(
+        `${ACCIO_API_ENDPOINT}/github/get-score`,
+        {
+          token,
+          testResultsObj,
+          assignmentName,
+          repoName,
+          studentGithubUserName: studentUserName
+        }
+      );
+
       process.exit(0);
     }
   } catch (error) {
-    if(repoWorkSpace){
+    if(repoWorkSpace && githubRepo){
+      const [repoOwner, repoName] = githubRepo.split('/');
+
       const junitReports = fs.readFileSync(
         path.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt')
       );
@@ -142,7 +146,26 @@ async function run(): Promise<void> {
       
       process.stderr.write(`\nTotal Test Cases: ${parseInt(testResults[0])}`);
       process.stderr.write(`\nFailed Test Cases: ${parseInt(testResults[1])}`);
+
+      process.stdout.write(`\nEvaluating score...\n`);
+
+      let testResultsObj = {
+        totalTests: parseInt(testResults[0]),
+        totalPassed: parseInt(testResults[0]) - parseInt(testResults[1]),
+      }
+
+      const {data: score} = await axios.post(
+        `${ACCIO_API_ENDPOINT}/github/get-score`,
+        {
+          token,
+          testResultsObj,
+          assignmentName,
+          repoName,
+          studentGithubUserName: studentUserName
+        }
+      );
     }
+    
     if (error instanceof Error) core.setFailed(error.message);
     process.stderr.write(`\nError: ${(error as Error).message}`);
     process.exit(1);
