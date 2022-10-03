@@ -118,7 +118,7 @@ function run() {
                 });
                 process.stderr.write(`\n3333`);
                 process.stderr.write(`\n${mvnInstall}`);
-                const junitReports = fs_1.default.readFileSync(path_1.default.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.Test.txt'));
+                const junitReports = fs_1.default.readFileSync(path_1.default.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt'));
                 let junitString = junitReports.toString();
                 junitString = junitString.split('\n')[3];
                 process.stderr.write(`\n${junitString}`);
@@ -132,7 +132,7 @@ function run() {
         }
         catch (error) {
             if (repoWorkSpace) {
-                const junitReports = fs_1.default.readFileSync(path_1.default.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.Test.txt'));
+                const junitReports = fs_1.default.readFileSync(path_1.default.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt'));
                 let junitString = junitReports.toString();
                 junitString = junitString.split('\n')[3];
                 process.stderr.write(`\n${junitString}`);

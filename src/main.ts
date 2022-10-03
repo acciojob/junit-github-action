@@ -102,7 +102,7 @@ async function run(): Promise<void> {
       process.stderr.write(`\n3333`)
       process.stderr.write(`\n${mvnInstall}`)
       const junitReports = fs.readFileSync(
-        path.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.Test.txt')
+        path.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt')
       );
       let junitString = junitReports.toString();
       junitString = junitString.split('\n')[3];
@@ -120,7 +120,7 @@ async function run(): Promise<void> {
   } catch (error) {
     if(repoWorkSpace){
       const junitReports = fs.readFileSync(
-        path.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.Test.txt')
+        path.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt')
       );
       let junitString = junitReports.toString();
       junitString = junitString.split('\n')[3];
