@@ -1,0 +1,10 @@
+name: 'assignment-action'
+description: 'Action to give score to the submitted assignment'
+author: 'acciojob'
+inputs:
+  accio_endpoint:
+    required: false
+    description: 'The accio endpoint'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
