@@ -64,6 +64,9 @@ async function run(): Promise<void> {
     );
 
     process.stderr.write(`\n2222`)
+    process.stderr.write(`\n${assignmentName}`)
+    process.stderr.write(`\n${studentUserName}`)
+    
     if (true) {
       const accioTestConfigData = fs.readFileSync(
         path.resolve(repoWorkSpace, 'acciotest.json')
