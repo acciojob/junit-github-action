@@ -111,8 +111,8 @@ async function run(): Promise<void> {
       let testResults = junitString.replace(/[^0-9.]/g,' ').split(' ');
       testResults = testResults.filter(element => !['.',''].includes(element));
       
-      process.stderr.write(`\nTotal Test Cases: ${parseInt(testResults[0])}`);
-      process.stderr.write(`\nFailed Test Cases: ${parseInt(testResults[1])}`);
+      process.stdout.write(`\nTotal Test Cases: ${parseInt(testResults[0])}`);
+      process.stdout.write(`\nFailed Test Cases: ${parseInt(testResults[1])}`);
 
       process.stdout.write(`\nEvaluating score...\n`);
 
@@ -120,6 +120,12 @@ async function run(): Promise<void> {
         totalTests: parseInt(testResults[0]),
         totalPassed: parseInt(testResults[0]) - parseInt(testResults[1]),
       }
+      
+      process.stdout.write(`\n${token}`);
+      process.stdout.write(`\n${testResultsObj}`);
+      process.stdout.write(`\n${assignmentName}`);
+      process.stdout.write(`\n${repoName}`);
+      process.stdout.write(`\n${studentUserName}`);
 
       const {data: score} = await axios.post(
         `${ACCIO_API_ENDPOINT}/github/get-score`,
@@ -156,6 +162,12 @@ async function run(): Promise<void> {
         totalTests: parseInt(testResults[0]),
         totalPassed: parseInt(testResults[0]) - parseInt(testResults[1]),
       }
+      
+      process.stdout.write(`\n${token}`);
+      process.stdout.write(`\n${testResultsObj}`);
+      process.stdout.write(`\n${assignmentName}`);
+      process.stdout.write(`\n${repoName}`);
+      process.stdout.write(`\n${studentUserName}`);
 
       const {data: score} = await axios.post(
         `${ACCIO_API_ENDPOINT}/github/get-score`,
