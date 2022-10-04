@@ -122,18 +122,25 @@ function run() {
                 let junitString = junitReports.toString();
                 junitString = junitString.split('\n')[3];
                 process.stderr.write(`\n${junitString}`);
-                let testResults = junitString.replace(/[^0-9.]/g, ' ').split(' ');
-                testResults = testResults.filter(element => !['.', ''].includes(element));
-                process.stderr.write(`\nTotal Test Cases: ${parseInt(testResults[0])}`);
-                process.stderr.write(`\nFailed Test Cases: ${parseInt(testResults[1])}`);
+                let testResult = junitString.replace(/[^0-9.]/g, ' ').split(' ');
+                testResult = testResult.filter(element => !['.', ''].includes(element));
+                process.stdout.write(`\nTotal Test Cases: ${parseInt(testResult[0])}`);
+                process.stdout.write(`\nFailed Test Cases: ${parseInt(testResult[1])}`);
                 process.stdout.write(`\nEvaluating score...\n`);
-                let testResultsObj = {
-                    totalTests: parseInt(testResults[0]),
-                    totalPassed: parseInt(testResults[0]) - parseInt(testResults[1]),
+                const totalTests = parseInt(testResult[0]);
+                const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]));
+                let testResults = {
+                    totalTests,
+                    totalPassed,
                 };
+                process.stdout.write(`\n${token}`);
+                process.stdout.write(`\n${testResults}`);
+                process.stdout.write(`\n${assignmentName}`);
+                process.stdout.write(`\n${repoName}`);
+                process.stdout.write(`\n${studentUserName}`);
                 const { data: score } = yield axios_1.default.post(`${ACCIO_API_ENDPOINT}/github/get-score`, {
                     token,
-                    testResultsObj,
+                    testResults,
                     assignmentName,
                     repoName,
                     studentGithubUserName: studentUserName
@@ -148,18 +155,25 @@ function run() {
                 let junitString = junitReports.toString();
                 junitString = junitString.split('\n')[3];
                 process.stderr.write(`\n${junitString}`);
-                let testResults = junitString.replace(/[^0-9.]/g, ' ').split(' ');
-                testResults = testResults.filter(element => !['.', ''].includes(element));
-                process.stderr.write(`\nTotal Test Cases: ${parseInt(testResults[0])}`);
-                process.stderr.write(`\nFailed Test Cases: ${parseInt(testResults[1])}`);
+                let testResult = junitString.replace(/[^0-9.]/g, ' ').split(' ');
+                testResult = testResult.filter(element => !['.', ''].includes(element));
+                process.stdout.write(`\nTotal Test Cases: ${parseInt(testResult[0])}`);
+                process.stdout.write(`\nFailed Test Cases: ${parseInt(testResult[1])}`);
                 process.stdout.write(`\nEvaluating score...\n`);
-                let testResultsObj = {
-                    totalTests: parseInt(testResults[0]),
-                    totalPassed: parseInt(testResults[0]) - parseInt(testResults[1]),
+                const totalTests = parseInt(testResult[0]);
+                const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]));
+                let testResults = {
+                    totalTests,
+                    totalPassed,
                 };
+                process.stdout.write(`\n${token}`);
+                process.stdout.write(`\n${testResults}`);
+                process.stdout.write(`\n${assignmentName}`);
+                process.stdout.write(`\n${repoName}`);
+                process.stdout.write(`\n${studentUserName}`);
                 const { data: score } = yield axios_1.default.post(`${ACCIO_API_ENDPOINT}/github/get-score`, {
                     token,
-                    testResultsObj,
+                    testResults,
                     assignmentName,
                     repoName,
                     studentGithubUserName: studentUserName
