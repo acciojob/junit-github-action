@@ -115,10 +115,13 @@ async function run(): Promise<void> {
       process.stdout.write(`\nFailed Test Cases: ${parseInt(testResults[1])}`);
 
       process.stdout.write(`\nEvaluating score...\n`);
+      
+      const totalTests = parseInt(testResults[0]);
+      const totalPassed = (parseInt(testResults[0]) - parseInt(testResults[1]));
 
       let testResultsObj = {
-        totalTests: parseInt(testResults[0]),
-        totalPassed: parseInt(testResults[0]) - parseInt(testResults[1]),
+        totalTests,
+        totalPassed,
       }
       
       process.stdout.write(`\n${token}`);
@@ -153,14 +156,17 @@ async function run(): Promise<void> {
       let testResults = junitString.replace(/[^0-9.]/g,' ').split(' ');
       testResults = testResults.filter(element => !['.',''].includes(element));
       
-      process.stderr.write(`\nTotal Test Cases: ${parseInt(testResults[0])}`);
-      process.stderr.write(`\nFailed Test Cases: ${parseInt(testResults[1])}`);
+      process.stdout.write(`\nTotal Test Cases: ${parseInt(testResults[0])}`);
+      process.stdout.write(`\nFailed Test Cases: ${parseInt(testResults[1])}`);
 
       process.stdout.write(`\nEvaluating score...\n`);
 
+      const totalTests = parseInt(testResults[0]);
+      const totalPassed = (parseInt(testResults[0]) - parseInt(testResults[1]));
+
       let testResultsObj = {
-        totalTests: parseInt(testResults[0]),
-        totalPassed: parseInt(testResults[0]) - parseInt(testResults[1]),
+        totalTests,
+        totalPassed,
       }
       
       process.stdout.write(`\n${token}`);
