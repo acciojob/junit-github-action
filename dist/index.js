@@ -62,28 +62,20 @@ function run() {
         const repoWorkSpace = process.env['GITHUB_WORKSPACE'];
         let studentUserName = '';
         let assignmentName = '';
-        // let token;
         try {
             process.stderr.write(`\n1111`);
             if (!githubRepo)
                 throw new Error('No GITHUB_REPOSITORY');
             const [repoOwner, repoName] = githubRepo.split('/');
             let token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
-            // let token = '1E46AD26F9A4EE2C3C8F927566721';
-            // process.stdout.write(`\n${token}`)
-            process.stdout.write(`\n2222`);
             if (!token)
                 throw new Error('No token given!');
-            process.stdout.write(`\n3333`);
             if (!repoWorkSpace)
                 throw new Error('No GITHUB_WORKSPACE');
-            process.stdout.write(`\n4444`);
             if (repoOwner !== 'acciojob')
                 throw new Error('Error not under acciojob');
-            process.stdout.write(`\n5555`);
             if (!repoName)
                 throw new Error('Failed to parse repoName');
-            process.stdout.write(`\n6666`);
             const contextPayload = github.context.payload;
             process.stderr.write(`\n${githubRepo}`);
             process.stderr.write(`\n${repoOwner}`);
@@ -108,7 +100,7 @@ function run() {
             process.stderr.write(`\n2222`);
             process.stderr.write(`\n${assignmentName}`);
             process.stderr.write(`\n${studentUserName}`);
-            if (true) {
+            if (assignmentName && studentUserName) {
                 const accioTestConfigData = fs_1.default.readFileSync(path_1.default.resolve(repoWorkSpace, 'acciotest.json'));
                 const accioTestConfig = JSON.parse(accioTestConfigData.toString());
                 const query = new URLSearchParams();
@@ -156,7 +148,7 @@ function run() {
             }
         }
         catch (error) {
-            if (repoWorkSpace && githubRepo) {
+            if (repoWorkSpace && githubRepo && assignmentName && studentUserName) {
                 let token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
                 const [repoOwner, repoName] = githubRepo.split('/');
                 const junitReports = fs_1.default.readFileSync(path_1.default.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt'));
@@ -174,7 +166,6 @@ function run() {
                     totalTests,
                     totalPassed,
                 };
-                // process.stdout.write(`\n${token}`);
                 process.stdout.write(`\n${testResults}`);
                 process.stdout.write(`\n${assignmentName}`);
                 process.stdout.write(`\n${repoName}`);
