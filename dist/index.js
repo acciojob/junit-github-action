@@ -69,14 +69,20 @@ function run() {
                 throw new Error('No GITHUB_REPOSITORY');
             const [repoOwner, repoName] = githubRepo.split('/');
             token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
+            process.stdout.write(`\n${token}`);
+            process.stdout.write(`\n2222`);
             if (!token)
                 throw new Error('No token given!');
+            process.stdout.write(`\n3333`);
             if (!repoWorkSpace)
                 throw new Error('No GITHUB_WORKSPACE');
+            process.stdout.write(`\n4444`);
             if (repoOwner !== 'acciojob')
                 throw new Error('Error not under acciojob');
+            process.stdout.write(`\n5555`);
             if (!repoName)
                 throw new Error('Failed to parse repoName');
+            process.stdout.write(`\n6666`);
             const contextPayload = github.context.payload;
             process.stderr.write(`\n${githubRepo}`);
             process.stderr.write(`\n${repoOwner}`);
