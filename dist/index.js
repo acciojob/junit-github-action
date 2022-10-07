@@ -68,7 +68,8 @@ function run() {
             if (!githubRepo)
                 throw new Error('No GITHUB_REPOSITORY');
             const [repoOwner, repoName] = githubRepo.split('/');
-            token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
+            // token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
+            token = '1E46AD26F9A4EE2C3C8F927566721';
             process.stdout.write(`\n${token}`);
             process.stdout.write(`\n2222`);
             if (!token)
