@@ -20,14 +20,14 @@ async function run(): Promise<void> {
   const repoWorkSpace: string | undefined = process.env['GITHUB_WORKSPACE'];
   let studentUserName = '';
   let assignmentName = '';
-  let token;
+  // let token;
   try {
     process.stderr.write(`\n1111`)
     if (!githubRepo) throw new Error('No GITHUB_REPOSITORY');
 
     const [repoOwner, repoName] = githubRepo.split('/');
-    // token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
-    token = '1E46AD26F9A4EE2C3C8F927566721';
+    let token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
+    // let token = '1E46AD26F9A4EE2C3C8F927566721';
 
     // process.stdout.write(`\n${token}`)
     process.stdout.write(`\n2222`)
@@ -152,6 +152,7 @@ async function run(): Promise<void> {
     }
   } catch (error) {
     if(repoWorkSpace && githubRepo){
+      let token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
       const [repoOwner, repoName] = githubRepo.split('/');
 
       const junitReports = fs.readFileSync(
