@@ -62,15 +62,15 @@ function run() {
         const repoWorkSpace = process.env['GITHUB_WORKSPACE'];
         let studentUserName = '';
         let assignmentName = '';
-        let token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
+        let token;
         try {
             process.stderr.write(`\n1111`);
             if (!githubRepo)
                 throw new Error('No GITHUB_REPOSITORY');
             const [repoOwner, repoName] = githubRepo.split('/');
             // token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
-            // token = '1E46AD26F9A4EE2C3C8F927566721';
-            process.stdout.write(`\n${token}`);
+            token = '1E46AD26F9A4EE2C3C8F927566721';
+            // process.stdout.write(`\n${token}`)
             process.stdout.write(`\n2222`);
             if (!token)
                 throw new Error('No token given!');
@@ -140,7 +140,7 @@ function run() {
                     totalTests,
                     totalPassed,
                 };
-                process.stdout.write(`\n${token}`);
+                // process.stdout.write(`\n${token}`);
                 process.stdout.write(`\n${testResults}`);
                 process.stdout.write(`\n${assignmentName}`);
                 process.stdout.write(`\n${repoName}`);
@@ -173,7 +173,7 @@ function run() {
                     totalTests,
                     totalPassed,
                 };
-                process.stdout.write(`\n${token}`);
+                // process.stdout.write(`\n${token}`);
                 process.stdout.write(`\n${testResults}`);
                 process.stdout.write(`\n${assignmentName}`);
                 process.stdout.write(`\n${repoName}`);
