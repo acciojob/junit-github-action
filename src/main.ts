@@ -185,7 +185,7 @@ async function run(): Promise<void> {
         }
       );
     }
-    
+    process.stdout.write(`\n${score}`);
     if (error instanceof Error) core.setFailed(error.message);
     process.stderr.write(`\nError: ${(error as Error).message}`);
     process.exit(1);
