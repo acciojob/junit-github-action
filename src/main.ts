@@ -116,7 +116,7 @@ async function run(): Promise<void> {
       process.stdout.write(`\nEvaluating score...\n`);
       
       const totalTests = parseInt(testResult[0]);
-      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]));
+      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - parseInt(testResult[2]);
 
       let testResults = {
         totalTests,
