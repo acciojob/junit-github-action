@@ -172,7 +172,7 @@ async function run(): Promise<void> {
       process.stdout.write(`\n${testResults}`);
       process.stdout.write(`\n${assignmentName}`);
       process.stdout.write(`\n${repoName}`);
-      process.stdout.write(`\n${studentUserName}`);
+      //process.stdout.write(`\n${studentUserName}`);
 
       const {data: score} = await axios.post(
         `${ACCIO_API_ENDPOINT}/github/get-score`,
