@@ -139,7 +139,7 @@ async function run(): Promise<void> {
           studentGithubUserName: studentUserName
         }
       );
-
+      process.stdout.write(`\n${score}`);
       process.exit(0);
     }
   } catch (error) {
