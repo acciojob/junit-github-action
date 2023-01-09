@@ -116,7 +116,7 @@ async function run(): Promise<void> {
       process.stdout.write(`\nEvaluating score...\n`);
       
       const totalTests = parseInt(testResult[0]);
-      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - parseInt(testResult[2]);
+      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]));
 
       let testResults = {
         totalTests,
@@ -139,7 +139,6 @@ async function run(): Promise<void> {
           studentGithubUserName: studentUserName
         }
       );
-      process.stdout.write(`\n${score}`);
       process.exit(0);
     }
   } catch (error) {
@@ -172,7 +171,7 @@ async function run(): Promise<void> {
       process.stdout.write(`\n${testResults}`);
       process.stdout.write(`\n${assignmentName}`);
       process.stdout.write(`\n${repoName}`);
-      //process.stdout.write(`\n${studentUserName}`);
+      process.stdout.write(`\n${studentUserName}`);
 
       const {data: score} = await axios.post(
         `${ACCIO_API_ENDPOINT}/github/get-score`,
@@ -185,7 +184,6 @@ async function run(): Promise<void> {
         }
       );
     }
-    process.stdout.write(`\n${score}`);
     if (error instanceof Error) core.setFailed(error.message);
     process.stderr.write(`\nError: ${(error as Error).message}`);
     process.exit(1);
