@@ -127,7 +127,8 @@ function run() {
                 process.stdout.write(`\nFailed Test Cases: ${parseInt(testResult[1])}`);
                 process.stdout.write(`\nEvaluating score...\n`);
                 const totalTests = parseInt(testResult[0]);
-                const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]));
+                const errorCases = (parseInt(testResult[1])) ? parseInt(testResult[1]) : 0;
+                const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases);
                 let testResults = {
                     totalTests,
                     totalPassed,
@@ -137,13 +138,14 @@ function run() {
                 process.stdout.write(`\n${assignmentName}`);
                 process.stdout.write(`\n${repoName}`);
                 process.stdout.write(`\n${studentUserName}`);
-                const { data: score } = yield axios_1.default.post(`${ACCIO_API_ENDPOINT}/github/get-score`, {
+                const response = yield axios_1.default.post(`${ACCIO_API_ENDPOINT}/github/get-score`, {
                     token,
                     testResults,
                     assignmentName,
                     repoName,
                     studentGithubUserName: studentUserName
                 });
+                process.stdout.write(`\nScore: ${response['scoreReceived']}`);
                 process.exit(0);
             }
         }
@@ -161,7 +163,8 @@ function run() {
                 process.stdout.write(`\nFailed Test Cases: ${parseInt(testResult[1])}`);
                 process.stdout.write(`\nEvaluating score...\n`);
                 const totalTests = parseInt(testResult[0]);
-                const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]));
+                const errorCases = (parseInt(testResult[1])) ? parseInt(testResult[1]) : 0;
+                const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases);
                 let testResults = {
                     totalTests,
                     totalPassed,
@@ -170,13 +173,14 @@ function run() {
                 process.stdout.write(`\n${assignmentName}`);
                 process.stdout.write(`\n${repoName}`);
                 process.stdout.write(`\n${studentUserName}`);
-                const { data: score } = yield axios_1.default.post(`${ACCIO_API_ENDPOINT}/github/get-score`, {
+                const response = yield axios_1.default.post(`${ACCIO_API_ENDPOINT}/github/get-score`, {
                     token,
                     testResults,
                     assignmentName,
                     repoName,
                     studentGithubUserName: studentUserName
                 });
+                process.stdout.write(`\nScore: ${response['scoreReceived']}`);
             }
             if (error instanceof Error)
                 core.setFailed(error.message);

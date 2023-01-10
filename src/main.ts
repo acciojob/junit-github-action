@@ -116,7 +116,8 @@ async function run(): Promise<void> {
       process.stdout.write(`\nEvaluating score...\n`);
       
       const totalTests = parseInt(testResult[0]);
-      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]));
+      const errorCases = (parseInt(testResult[1]))? parseInt(testResult[1]): 0;
+      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases);
 
       let testResults = {
         totalTests,
@@ -129,7 +130,7 @@ async function run(): Promise<void> {
       process.stdout.write(`\n${repoName}`);
       process.stdout.write(`\n${studentUserName}`);
 
-      const {data: score} = await axios.post(
+      const response: any = await axios.post(
         `${ACCIO_API_ENDPOINT}/github/get-score`,
         {
           token,
@@ -139,6 +140,8 @@ async function run(): Promise<void> {
           studentGithubUserName: studentUserName
         }
       );
+
+      process.stdout.write(`\nScore: ${response['scoreReceived']}`);
       process.exit(0);
     }
   } catch (error) {
@@ -161,7 +164,8 @@ async function run(): Promise<void> {
       process.stdout.write(`\nEvaluating score...\n`);
       
       const totalTests = parseInt(testResult[0]);
-      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]));
+      const errorCases = (parseInt(testResult[1]))? parseInt(testResult[1]): 0;
+      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases);
 
       let testResults = {
         totalTests,
@@ -173,7 +177,7 @@ async function run(): Promise<void> {
       process.stdout.write(`\n${repoName}`);
       process.stdout.write(`\n${studentUserName}`);
 
-      const {data: score} = await axios.post(
+      const response: any = await axios.post(
         `${ACCIO_API_ENDPOINT}/github/get-score`,
         {
           token,
@@ -183,6 +187,8 @@ async function run(): Promise<void> {
           studentGithubUserName: studentUserName
         }
       );
+
+      process.stdout.write(`\nScore: ${response['scoreReceived']}`);
     }
     if (error instanceof Error) core.setFailed(error.message);
     process.stderr.write(`\nError: ${(error as Error).message}`);
