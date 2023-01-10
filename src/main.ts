@@ -116,7 +116,7 @@ async function run(): Promise<void> {
       process.stdout.write(`\nEvaluating score...\n`);
       
       const totalTests = parseInt(testResult[0]);
-      const errorCases = (parseInt(testResult[1]))? parseInt(testResult[1]): 0;
+      const errorCases = (parseInt(testResult[2]))? parseInt(testResult[2]): 0;
       const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases);
 
       let testResults = {
@@ -141,7 +141,7 @@ async function run(): Promise<void> {
         }
       );
 
-      process.stdout.write(`\nScore: ${response['scoreReceived']}`);
+      process.stdout.write(`\nScore: ${response.data['scoreReceived']}`);
       process.exit(0);
     }
   } catch (error) {
@@ -164,7 +164,7 @@ async function run(): Promise<void> {
       process.stdout.write(`\nEvaluating score...\n`);
       
       const totalTests = parseInt(testResult[0]);
-      const errorCases = (parseInt(testResult[1]))? parseInt(testResult[1]): 0;
+      const errorCases = (parseInt(testResult[2]))? parseInt(testResult[2]): 0;
       const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases);
 
       let testResults = {
@@ -188,7 +188,7 @@ async function run(): Promise<void> {
         }
       );
 
-      process.stdout.write(`\nScore: ${response['scoreReceived']}`);
+      process.stdout.write(`\nScore: ${response.data['scoreReceived']}`);
     }
     if (error instanceof Error) core.setFailed(error.message);
     process.stderr.write(`\nError: ${(error as Error).message}`);
