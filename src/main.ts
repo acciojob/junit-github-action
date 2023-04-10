@@ -4,6 +4,7 @@ import * as exec from '@actions/exec';
 import * as github from '@actions/github';
 import fs from 'fs';
 import path from 'path';
+import CryptoJS from 'crypto-js';
 
 // acciotest.json
 /*
@@ -13,15 +14,62 @@ import path from 'path';
 }
 */
 
+const ignoreFile = [
+  '.git',
+  '.gitignore',
+  'node_modules',
+  'package-lock.json',
+  'package.json',
+  'encrypted',
+  '.acciotest.json',
+  'test.yml',
+  '.cypress.json'
+];
+const permanentIgnore = ['node_modules', '.git', 'encrypted'];
+
+async function decrypt(
+  path: string,
+  parentDirectory: string,
+  childDirectory: string
+) {
+  try {
+    const dir = await fs.promises.opendir(`${path}/${childDirectory}`);
+    const newFilePath = `${path}/${parentDirectory}/${childDirectory}`;
+
+    for await (const dirent of dir) {
+      if (dirent.name === parentDirectory) {
+        continue;
+      } else if (!ignoreFile.includes(dirent.name) && dirent.isDirectory()) {
+        decrypt(path, parentDirectory, `${childDirectory}/${dirent.name}`);
+      } else if (!ignoreFile.includes(dirent.name) && !dirent.isDirectory()) {
+        let content = fs
+          .readFileSync(`${path}/${childDirectory}/${dirent.name}`)
+          .toString();
+        var bytes = CryptoJS.AES.decrypt(content, 'piyush<3rajat');
+        var originalText = bytes.toString(CryptoJS.enc.Utf8);
+        var stream = fs.createWriteStream(`${newFilePath}/${dirent.name}`);
+        stream.write(originalText);
+      } else if (!permanentIgnore.includes(dirent.name)) {
+        fs.copyFileSync(
+          `${path}/${childDirectory}/${dirent.name}`,
+          `${newFilePath}/${dirent.name}`
+        );
+      }
+    }
+    return;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 async function run(): Promise<void> {
-  const ACCIO_API_ENDPOINT =
-      'https://accio-release-1-dot-acciojob-prod.el.r.appspot.com';
+  const ACCIO_API_ENDPOINT = process.env['ACCIOJOB_BACKEND_URL'];
   const githubRepo = process.env['GITHUB_REPOSITORY'];
   const repoWorkSpace: string | undefined = process.env['GITHUB_WORKSPACE'];
   let studentUserName = '';
   let assignmentName = '';
+  let questionTypeContent = '';
   try {
-    process.stderr.write(`\n1111`)
     if (!githubRepo) throw new Error('No GITHUB_REPOSITORY');
 
     const [repoOwner, repoName] = githubRepo.split('/');
@@ -33,12 +81,6 @@ async function run(): Promise<void> {
     if (!repoName) throw new Error('Failed to parse repoName');
 
     const contextPayload = github.context.payload;
-    process.stderr.write(`\n${githubRepo}`)
-    process.stderr.write(`\n${repoOwner}`)
-    process.stderr.write(`\n${repoName}`)
-    process.stderr.write(`\n${contextPayload}`)
-    process.stderr.write(`\n${contextPayload.pusher.name}`)
-    process.stderr.write(`\n${contextPayload.pusher.username}`)
 
     if (contextPayload.pusher.username) {
       if (repoName.includes(contextPayload.pusher.username)) {
@@ -62,15 +104,21 @@ async function run(): Promise<void> {
       `Pusher Username = ${contextPayload.pusher.username}\nPusher Name = ${contextPayload.pusher.name}`
     );
 
-    process.stderr.write(`\n2222`)
-    process.stderr.write(`\n${assignmentName}`)
-    process.stderr.write(`\n${studentUserName}`)
-    
     if (assignmentName && studentUserName) {
+      const questionTypeQuery = new URLSearchParams();
+
+      questionTypeQuery.append('templateName', assignmentName);
+      const questionTypeData = await axios.get(
+        `${ACCIO_API_ENDPOINT}/github/get-question-type?${questionTypeQuery.toString()}`
+      );
+      questionTypeContent = questionTypeData.data;
+
+      process.stdout.write(`question type = ${questionTypeContent}\n`);
+
       const accioTestConfigData = fs.readFileSync(
         path.resolve(repoWorkSpace, 'acciotest.json')
       );
-      
+
       const accioTestConfig = JSON.parse(accioTestConfigData.toString());
 
       const query = new URLSearchParams();
@@ -88,42 +136,81 @@ async function run(): Promise<void> {
         'base64'
       ).toString('utf8');
 
-      fs.mkdirSync(path.resolve(repoWorkSpace, 'src/test/java/com/driver/test'), {
-        recursive: true
-      });
+      let junitReports;
 
-      fs.writeFileSync(
-        path.resolve(repoWorkSpace, 'src/test/java/com/driver/test/TestCases.java'),
-        testFileContent
-      );
+      if (questionTypeContent == 'CONTEST') {
+        await decrypt(repoWorkSpace + '/encrypted', '', '');
+        const encryptedRepoWorkSpace = repoWorkSpace + '/encrypted';
+        fs.mkdirSync(
+          path.resolve(encryptedRepoWorkSpace, 'src/test/java/com/driver/test'),
+          {
+            recursive: true
+          }
+        );
 
-      const mvnInstall = await exec.exec('mvn install', undefined, {
-        cwd: repoWorkSpace
-      });
+        fs.writeFileSync(
+          path.resolve(
+            encryptedRepoWorkSpace,
+            'src/test/java/com/driver/test/TestCases.java'
+          ),
+          testFileContent
+        );
+        await exec.exec('mvn install', undefined, {
+          cwd: encryptedRepoWorkSpace
+        });
+        junitReports = fs.readFileSync(
+          path.resolve(
+            encryptedRepoWorkSpace,
+            'target/surefire-reports/com.driver.test.TestCases.txt'
+          )
+        );
+      } else {
+        fs.mkdirSync(
+          path.resolve(repoWorkSpace, 'src/test/java/com/driver/test'),
+          {
+            recursive: true
+          }
+        );
 
-      const junitReports = fs.readFileSync(
-        path.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt')
-      );
+        fs.writeFileSync(
+          path.resolve(
+            repoWorkSpace,
+            'src/test/java/com/driver/test/TestCases.java'
+          ),
+          testFileContent
+        );
+        await exec.exec('mvn install', undefined, {
+          cwd: repoWorkSpace
+        });
+        junitReports = fs.readFileSync(
+          path.resolve(
+            repoWorkSpace,
+            'target/surefire-reports/com.driver.test.TestCases.txt'
+          )
+        );
+      }
+
       let junitString = junitReports.toString();
       junitString = junitString.split('\n')[3];
       process.stderr.write(`\n${junitString}`);
-      let testResult = junitString.replace(/[^0-9.]/g,' ').split(' ');
-      testResult = testResult.filter(element => !['.',''].includes(element));
-      
+      let testResult = junitString.replace(/[^0-9.]/g, ' ').split(' ');
+      testResult = testResult.filter(element => !['.', ''].includes(element));
+
       process.stdout.write(`\nTotal Test Cases: ${parseInt(testResult[0])}`);
       process.stdout.write(`\nFailed Test Cases: ${parseInt(testResult[1])}`);
 
       process.stdout.write(`\nEvaluating score...\n`);
-      
+
       const totalTests = parseInt(testResult[0]);
-      const errorCases = (parseInt(testResult[2]))? parseInt(testResult[2]): 0;
-      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases);
+      const errorCases = parseInt(testResult[2]) ? parseInt(testResult[2]) : 0;
+      const totalPassed =
+        parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases;
 
       let testResults = {
         totalTests,
-        totalPassed,
-      }
-      
+        totalPassed
+      };
+
       // process.stdout.write(`\n${token}`);
       process.stdout.write(`\n${testResults}`);
       process.stdout.write(`\n${assignmentName}`);
@@ -145,33 +232,46 @@ async function run(): Promise<void> {
       process.exit(0);
     }
   } catch (error) {
-    if(repoWorkSpace && githubRepo && assignmentName && studentUserName){
+    if (repoWorkSpace && githubRepo && assignmentName && studentUserName) {
       let token = process.env['ACCIO_ASGMNT_ACTION_TOKEN'];
       const [repoOwner, repoName] = githubRepo.split('/');
+      let junitReports;
+      if (questionTypeContent == 'CONTEST') {
+        junitReports = fs.readFileSync(
+          path.resolve(
+            repoWorkSpace + '/encrypted',
+            'target/surefire-reports/com.driver.test.TestCases.txt'
+          )
+        );
+      }
 
-      const junitReports = fs.readFileSync(
-        path.resolve(repoWorkSpace, 'target/surefire-reports/com.driver.test.TestCases.txt')
+      junitReports = fs.readFileSync(
+        path.resolve(
+          repoWorkSpace,
+          'target/surefire-reports/com.driver.test.TestCases.txt'
+        )
       );
       let junitString = junitReports.toString();
       junitString = junitString.split('\n')[3];
       process.stderr.write(`\n${junitString}`);
-      let testResult = junitString.replace(/[^0-9.]/g,' ').split(' ');
-      testResult = testResult.filter(element => !['.',''].includes(element));
-      
+      let testResult = junitString.replace(/[^0-9.]/g, ' ').split(' ');
+      testResult = testResult.filter(element => !['.', ''].includes(element));
+
       process.stdout.write(`\nTotal Test Cases: ${parseInt(testResult[0])}`);
       process.stdout.write(`\nFailed Test Cases: ${parseInt(testResult[1])}`);
 
       process.stdout.write(`\nEvaluating score...\n`);
-      
+
       const totalTests = parseInt(testResult[0]);
-      const errorCases = (parseInt(testResult[2]))? parseInt(testResult[2]): 0;
-      const totalPassed = (parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases);
+      const errorCases = parseInt(testResult[2]) ? parseInt(testResult[2]) : 0;
+      const totalPassed =
+        parseInt(testResult[0]) - parseInt(testResult[1]) - errorCases;
 
       let testResults = {
         totalTests,
-        totalPassed,
-      }
-      
+        totalPassed
+      };
+
       process.stdout.write(`\n${testResults}`);
       process.stdout.write(`\n${assignmentName}`);
       process.stdout.write(`\n${repoName}`);
