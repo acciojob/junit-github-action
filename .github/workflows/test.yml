@@ -1,17 +1,10 @@
-name: 'build-test'
-on: # rebuild any PRs and main branch changes
-  pull_request:
-  push:
-    branches:
-      - main
-      - 'releases/*'
+name: Acciojob Tests
+
+on:
+ push:
+    branches: [ "main","master" ]
 
 jobs:
-  build: # make sure build/ci work properly
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: |
-          npm install
-      - run: |
-          npm run all
+  calling-acciojob-main-action:
+    uses: acciojob/acciojob-tests-action/.github/workflows/main-action.yml@main
+    secrets: inherit
